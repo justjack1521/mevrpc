@@ -2,39 +2,36 @@ package mevrpc
 
 import (
 	"context"
-	"github.com/justjack1521/mevrpc/internal"
+	"errors"
 	uuid "github.com/satori/go.uuid"
+	"google.golang.org/grpc/metadata"
 )
 
-type Context struct {
-	UserID   uuid.UUID
-	PlayerID uuid.UUID
-}
+var ErrUnableToParseMetaData = errors.New("unable to parse metadata")
+var ErrMetaDataContainsMalformedUserID = errors.New("metadata contains malformed user uuid")
 
-func NewContext(ctx context.Context, cxn *Context) context.Context {
-	return context.WithValue(ctx, internal.ContextKey, cxn)
-}
-
-func FromContext(ctx context.Context) *Context {
-	if ctx == nil {
-		return nil
+func UserIDFromContext(ctx context.Context) (uuid.UUID, error) {
+	md, ok := metadata.FromIncomingContext(ctx)
+	if ok == false {
+		return uuid.Nil, ErrUnableToParseMetaData
 	}
-	h, _ := ctx.Value(internal.ContextKey).(*Context)
-	return h
+	client := md.Get("X-API-USER")[0]
+	user, err := uuid.FromString(client)
+	if uuid.Equal(user, uuid.Nil) || err != nil {
+		return uuid.Nil, ErrMetaDataContainsMalformedUserID
+	}
+	return user, nil
 }
 
-func UserIDFromContext(ctx context.Context) uuid.UUID {
-	var cxn = FromContext(ctx)
-	if cxn == nil {
-		return uuid.Nil
+func PlayerIDFromContext(ctx context.Context) (uuid.UUID, error) {
+	md, ok := metadata.FromIncomingContext(ctx)
+	if ok == false {
+		return uuid.Nil, ErrUnableToParseMetaData
 	}
-	return cxn.UserID
-}
-
-func PlayerIDFromContext(ctx context.Context) uuid.UUID {
-	var cxn = FromContext(ctx)
-	if cxn == nil {
-		return uuid.Nil
+	client := md.Get("X-API-PLAYER")[0]
+	player, err := uuid.FromString(client)
+	if uuid.Equal(player, uuid.Nil) || err != nil {
+		return uuid.Nil, ErrMetaDataContainsMalformedUserID
 	}
-	return cxn.PlayerID
+	return player, nil
 }
