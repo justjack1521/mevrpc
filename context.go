@@ -7,6 +7,11 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
+const (
+	UserIDCMetadataKey  = "X-API-USER"
+	PlayerIDMetadataKey = "X-API-PLAYER"
+)
+
 var ErrUnableToParseMetaData = errors.New("unable to parse metadata")
 var ErrMetaDataContainsMalformedUserID = errors.New("metadata contains malformed user uuid")
 var ErrMetaDataContainsMalformedPlayerID = errors.New("metadata contains malformed player uuid")
@@ -16,10 +21,10 @@ func UserIDFromContext(ctx context.Context) uuid.UUID {
 	if ok == false {
 		return uuid.Nil
 	}
-	if len(md.Get("X-API-USER")) == 0 {
+	if len(md.Get(UserIDCMetadataKey)) == 0 {
 		return uuid.Nil
 	}
-	val := md.Get("X-API-USER")[0]
+	val := md.Get(UserIDCMetadataKey)[0]
 	return uuid.FromStringOrNil(val)
 }
 
@@ -28,10 +33,10 @@ func MustUserIDFromContext(ctx context.Context) (uuid.UUID, error) {
 	if ok == false {
 		return uuid.Nil, ErrUnableToParseMetaData
 	}
-	if len(md.Get("X-API-USER")) == 0 {
+	if len(md.Get(UserIDCMetadataKey)) == 0 {
 		return uuid.Nil, ErrMetaDataContainsMalformedUserID
 	}
-	client := md.Get("X-API-USER")[0]
+	client := md.Get(UserIDCMetadataKey)[0]
 	user, err := uuid.FromString(client)
 	if uuid.Equal(user, uuid.Nil) || err != nil {
 		return uuid.Nil, ErrMetaDataContainsMalformedUserID
@@ -44,10 +49,10 @@ func PlayerIDFromContext(ctx context.Context) uuid.UUID {
 	if ok == false {
 		return uuid.Nil
 	}
-	if len(md.Get("X-API-PLAYER")) == 0 {
+	if len(md.Get(PlayerIDMetadataKey)) == 0 {
 		return uuid.Nil
 	}
-	val := md.Get("X-API-PLAYER")[0]
+	val := md.Get(PlayerIDMetadataKey)[0]
 	return uuid.FromStringOrNil(val)
 }
 
@@ -56,10 +61,10 @@ func MustPlayerIDFromContext(ctx context.Context) (uuid.UUID, error) {
 	if ok == false {
 		return uuid.Nil, ErrUnableToParseMetaData
 	}
-	if len(md.Get("X-API-PLAYER")) == 0 {
+	if len(md.Get(PlayerIDMetadataKey)) == 0 {
 		return uuid.Nil, ErrMetaDataContainsMalformedPlayerID
 	}
-	client := md.Get("X-API-PLAYER")[0]
+	client := md.Get(PlayerIDMetadataKey)[0]
 	player, err := uuid.FromString(client)
 	if uuid.Equal(player, uuid.Nil) || err != nil {
 		return uuid.Nil, ErrMetaDataContainsMalformedPlayerID
