@@ -16,7 +16,7 @@ var (
 	}
 )
 
-func IdentityExtractionInterceptor(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp any, err error) {
+func IdentityExtractionUnaryServerInterceptor(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp any, err error) {
 	_, err = MustUserIDFromContext(ctx)
 	if err != nil {
 		return nil, err
@@ -29,7 +29,7 @@ func IdentityExtractionInterceptor(ctx context.Context, req any, info *grpc.Unar
 	return
 }
 
-func IdentityCopyInterceptor(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
+func IdentityCopyUnaryClientInterceptor(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
 	user, err := MustUserIDFromContext(ctx)
 	if err != nil {
 		return err
