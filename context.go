@@ -20,6 +20,13 @@ var (
 	errPlayerIDMissingFromMetaData       = errors.New("player id missing from metadata")
 )
 
+func NewOutgoingContext(ctx context.Context, user uuid.UUID, player uuid.UUID) context.Context {
+	return metadata.NewOutgoingContext(ctx, metadata.New(map[string]string{
+		UserIDCMetadataKey:  user.String(),
+		PlayerIDMetadataKey: player.String(),
+	}))
+}
+
 func UserIDFromContext(ctx context.Context) uuid.UUID {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if ok == false {
