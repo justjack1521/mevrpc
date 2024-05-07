@@ -3,6 +3,7 @@ package mevrpc
 import (
 	"context"
 	"errors"
+	"fmt"
 	uuid "github.com/satori/go.uuid"
 	"google.golang.org/grpc/metadata"
 )
@@ -13,11 +14,18 @@ const (
 )
 
 var (
-	errUnableToParseMetaData             = errors.New("unable to parse metadata")
-	errUserIDMissingFromMetaData         = errors.New("user id missing from metadata")
-	errMetaDataContainsMalformedUserID   = errors.New("metadata contains malformed user uuid")
-	errMetaDataContainsMalformedPlayerID = errors.New("metadata contains malformed player uuid")
-	errPlayerIDMissingFromMetaData       = errors.New("player id missing from metadata")
+	errUnableExtractUserIDFromMetadata = func(err error) error {
+		return fmt.Errorf("unable to extract user id from metadata: %w", err)
+	}
+	errUnableExtractPlayerIDFromMetadata = func(err error) error {
+		return fmt.Errorf("unable to extract player id from metadata: %w", err)
+	}
+)
+
+var (
+	errUnableToParseMetaData       = errors.New("unable to parse metadata")
+	errMetaDataContainsMalformedID = errors.New("metadata contains malformed uuid")
+	errIDMissingFromMetaData       = errors.New("id missing from metadata")
 )
 
 func NewOutgoingContext(ctx context.Context, user uuid.UUID, player uuid.UUID) context.Context {
@@ -42,15 +50,15 @@ func UserIDFromContext(ctx context.Context) uuid.UUID {
 func MustUserIDFromContext(ctx context.Context) (uuid.UUID, error) {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if ok == false {
-		return uuid.Nil, errUnableToParseMetaData
+		return uuid.Nil, errUnableExtractUserIDFromMetadata(errUnableToParseMetaData)
 	}
 	if len(md.Get(UserIDCMetadataKey)) == 0 {
-		return uuid.Nil, errUserIDMissingFromMetaData
+		return uuid.Nil, errUnableExtractUserIDFromMetadata(errIDMissingFromMetaData)
 	}
 	client := md.Get(UserIDCMetadataKey)[0]
 	user, err := uuid.FromString(client)
 	if uuid.Equal(user, uuid.Nil) || err != nil {
-		return uuid.Nil, errMetaDataContainsMalformedUserID
+		return uuid.Nil, errUnableExtractUserIDFromMetadata(errMetaDataContainsMalformedID)
 	}
 	return user, nil
 }
@@ -70,15 +78,15 @@ func PlayerIDFromContext(ctx context.Context) uuid.UUID {
 func MustPlayerIDFromContext(ctx context.Context) (uuid.UUID, error) {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if ok == false {
-		return uuid.Nil, errUnableToParseMetaData
+		return uuid.Nil, errUnableExtractPlayerIDFromMetadata(errUnableToParseMetaData)
 	}
 	if len(md.Get(PlayerIDMetadataKey)) == 0 {
-		return uuid.Nil, errPlayerIDMissingFromMetaData
+		return uuid.Nil, errUnableExtractPlayerIDFromMetadata(errIDMissingFromMetaData)
 	}
 	client := md.Get(PlayerIDMetadataKey)[0]
 	player, err := uuid.FromString(client)
 	if uuid.Equal(player, uuid.Nil) || err != nil {
-		return uuid.Nil, errMetaDataContainsMalformedPlayerID
+		return uuid.Nil, errUnableExtractPlayerIDFromMetadata(errMetaDataContainsMalformedID)
 	}
 	return player, nil
 }
