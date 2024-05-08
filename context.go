@@ -18,10 +18,10 @@ var (
 		return fmt.Errorf("unable to extract user id from context: %w", err)
 	}
 	errUnableExtractPlayerIDFromContext = func(err error) error {
-		return fmt.Errorf("unable to extract user id from context: %w", err)
+		return fmt.Errorf("unable to extract player id from context: %w", err)
 	}
 	errUnableExtractUserIDFromOutgoingContext = func(err error) error {
-		return fmt.Errorf("unable to extract player id from outgoing context: %w", err)
+		return fmt.Errorf("unable to extract user id from outgoing context: %w", err)
 	}
 	errUnableExtractUserIDFromIncomingContext = func(err error) error {
 		return fmt.Errorf("unable to extract user id from incoming context: %w", err)
