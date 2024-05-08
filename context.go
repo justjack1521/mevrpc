@@ -67,18 +67,16 @@ func UserIDFromContext(ctx context.Context) uuid.UUID {
 	out, ok := metadata.FromOutgoingContext(ctx)
 	if ok == true {
 		user, err := userIDFromMetadata(out)
-		if err != nil {
-			return uuid.Nil
+		if err == nil {
+			return user
 		}
-		return user
 	}
 	in, ok := metadata.FromIncomingContext(ctx)
 	if ok == true {
 		user, err := userIDFromMetadata(in)
-		if err != nil {
-			return uuid.Nil
+		if err == nil {
+			return user
 		}
-		return user
 	}
 	return uuid.Nil
 }
@@ -87,18 +85,16 @@ func PlayerIDFromContext(ctx context.Context) uuid.UUID {
 	out, ok := metadata.FromOutgoingContext(ctx)
 	if ok == true {
 		player, err := playerIDFromMetadata(out)
-		if err != nil {
-			return uuid.Nil
+		if err == nil {
+			return player
 		}
-		return player
 	}
 	in, ok := metadata.FromIncomingContext(ctx)
 	if ok == true {
 		player, err := playerIDFromMetadata(in)
-		if err != nil {
-			return uuid.Nil
+		if err == nil {
+			return player
 		}
-		return player
 	}
 	return uuid.Nil
 }
@@ -107,18 +103,16 @@ func MustUserIDFromContext(ctx context.Context) (uuid.UUID, error) {
 	out, ok := metadata.FromOutgoingContext(ctx)
 	if ok == true {
 		user, err := userIDFromMetadata(out)
-		if err != nil {
-			return uuid.Nil, errUnableExtractUserIDFromOutgoingContext(err)
+		if err == nil {
+			return user, nil
 		}
-		return user, nil
 	}
 	in, ok := metadata.FromIncomingContext(ctx)
 	if ok == true {
 		user, err := userIDFromMetadata(in)
-		if err != nil {
-			return uuid.Nil, errUnableExtractUserIDFromIncomingContext(err)
+		if err == nil {
+			return user, nil
 		}
-		return user, nil
 	}
 	return uuid.Nil, errUnableExtractUserIDFromContext(errUnableToParseMetaData)
 }
@@ -127,18 +121,16 @@ func MustPlayerIDFromContext(ctx context.Context) (uuid.UUID, error) {
 	out, ok := metadata.FromOutgoingContext(ctx)
 	if ok == true {
 		player, err := playerIDFromMetadata(out)
-		if err != nil {
-			return uuid.Nil, errUnableExtractPlayerIDFromOutgoingContext(err)
+		if err == nil {
+			return player, nil
 		}
-		return player, nil
 	}
 	in, ok := metadata.FromIncomingContext(ctx)
 	if ok == true {
 		player, err := playerIDFromMetadata(in)
-		if err != nil {
-			return uuid.Nil, errUnableExtractPlayerIDFromIncomingContext(err)
+		if err == nil {
+			return player, nil
 		}
-		return player, nil
 	}
 	return uuid.Nil, errUnableExtractPlayerIDFromContext(errUnableToParseMetaData)
 }
