@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/metadata"
 )
 
 var (
@@ -30,14 +29,13 @@ func IdentityExtractionUnaryServerInterceptor(ctx context.Context, req any, info
 }
 
 func IdentityCopyUnaryClientInterceptor(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
-	user, err := MustUserIDFromOutgoingContext(ctx)
+	user, err := MustUserIDFromIncomingContext(ctx)
 	if err != nil {
 		return errFailedCopyIdentity(err)
 	}
-	player, err := MustPlayerIDFromOutgoingContext(ctx)
+	player, err := MustPlayerIDFromIncomingContext(ctx)
 	if err != nil {
 		return errFailedCopyIdentity(err)
 	}
-	ctx = metadata.AppendToOutgoingContext(ctx, UserIDMetadataKey, user.String(), PlayerIDMetadataKey, player.String())
-	return invoker(ctx, method, req, reply, cc, opts...)
+	return invoker(NewOutgoingContext(ctx, user, player), method, req, reply, cc, opts...)
 }
