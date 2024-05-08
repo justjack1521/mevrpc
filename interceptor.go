@@ -16,11 +16,11 @@ var (
 )
 
 func IdentityExtractionUnaryServerInterceptor(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp any, err error) {
-	_, err = MustUserIDFromIncomingContext(ctx)
+	_, err = MustUserIDFromContext(ctx)
 	if err != nil {
 		return nil, errFailedExtractIdentity(err)
 	}
-	_, err = MustPlayerIDFromIncomingContext(ctx)
+	_, err = MustPlayerIDFromContext(ctx)
 	if err != nil {
 		return nil, errFailedExtractIdentity(err)
 	}
@@ -29,11 +29,11 @@ func IdentityExtractionUnaryServerInterceptor(ctx context.Context, req any, info
 }
 
 func IdentityCopyUnaryClientInterceptor(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
-	user, err := MustUserIDFromIncomingContext(ctx)
+	user, err := MustUserIDFromContext(ctx)
 	if err != nil {
 		return errFailedCopyIdentity(err)
 	}
-	player, err := MustPlayerIDFromIncomingContext(ctx)
+	player, err := MustPlayerIDFromContext(ctx)
 	if err != nil {
 		return errFailedCopyIdentity(err)
 	}
